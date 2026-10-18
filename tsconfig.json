@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    // Node 22 (Dockerfile의 node:22-alpine) 기준
+    "lib": ["ES2023"],
+    "target": "ES2023",
+    "types": ["node"],
+
+    // package.json의 "type": "module"에 맞춰 ESM으로 출력
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "verbatimModuleSyntax": true,
+
+    // src/*.ts → dist/*.js
+    "rootDir": "src",
+    "outDir": "dist",
+
+    // Best practices
+    "strict": true,
+    "skipLibCheck": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true
+  },
+  "include": ["src"]
+}
