@@ -10,9 +10,9 @@ export default $config({
       providers: {
         aws: {
           region: "us-east-1",
-          profile: "dev"
-        }
-      }
+          profile: "dev",
+        },
+      },
     }
   },
   async run() {
@@ -21,7 +21,7 @@ export default $config({
 
     // ECS cluster
     const cluster = new sst.aws.Cluster("MyCluster", {
-      vpc
+      vpc,
     })
 
     // Fargate service + ALB
@@ -29,17 +29,17 @@ export default $config({
       cluster,
       image: {
         context: "./",
-        dockerfile: "Dockerfile"
+        dockerfile: "Dockerfile",
       },
       cpu: "0.25 vCPU",
       memory: "0.5 GB",
       environment: {
-        PORT: "3000"
+        PORT: "3000",
       },
       scaling: {
         min: 2,
         max: 4,
-        cpuUtilization: 70
+        cpuUtilization: 70,
       },
 
       loadBalancer: {
@@ -55,13 +55,12 @@ export default $config({
       },
 
       dev: {
-        command: "bun run dev"
-      }
+        command: "bun run dev",
+      },
     })
 
     return {
-      url: service.url
+      url: service.url,
     }
-
   },
 })

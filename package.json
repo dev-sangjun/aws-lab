@@ -1,22 +1,31 @@
 {
   "name": "aws-lab",
+  "private": true,
   "type": "module",
   "scripts": {
     "build": "tsc",
     "dev": "tsx watch src/index.ts",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "lint": "oxlint --deny-warnings",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "check": "bun run lint && bun run format:check && bun run typecheck",
+    "prepare": "lefthook install || true",
+    "typecheck": "tsc --noEmit"
   },
-  "private": true,
+  "dependencies": {
+    "express": "^5.3.0",
+    "sst": "4.17.2"
+  },
   "devDependencies": {
     "@types/aws-lambda": "8.10.164",
     "@types/bun": "latest",
     "@types/express": "^5.0.6",
     "@types/node": "^26.6.5",
+    "lefthook": "2.2.2",
+    "oxfmt": "0.74.0",
+    "oxlint": "1.89.0",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2"
-  },
-  "dependencies": {
-    "express": "^5.3.0",
-    "sst": "4.17.2"
   }
 }

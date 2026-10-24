@@ -15,6 +15,8 @@ Hands-on labs for learning AWS one service at a time with SST v4. Each lab ends 
 bun install                    # install dependencies
 bun run dev                    # run the API locally (tsx watch)
 bun run build                  # compile src/ to dist/
+bun run check                  # lint + format check + type check (same as CI)
+bun run format                 # format everything with oxfmt
 bunx sst deploy --stage dev    # create or update everything on AWS
 bunx sst remove --stage dev    # delete everything after a lab
 ```
@@ -24,6 +26,13 @@ bunx sst remove --stage dev    # delete everything after a lab
 - Code comments are in English, short, and say what a line is for.
 - `README.md` and `docs/labs/*.md` are in English. Each lab adds `docs/labs/NN-<slug>.md` and a row in the README lab table.
 - Commits follow Conventional Commits: `<type>: <subject>`, lowercase, imperative.
+- Formatting is oxfmt (no semicolons, double quotes, 2-space indent); linting is oxlint. Both are set in `.oxfmtrc.json` and `.oxlintrc.json`.
+
+## Pre-commit hook and CI
+
+- `bun install` installs a lefthook pre-commit hook (`lefthook.yml`): it formats and lint-fixes the staged files, re-stages them, then runs the type check.
+- If a commit fails the hook, fix the reported problem and commit again until it passes. Never skip it with `--no-verify` or `LEFTHOOK=0`.
+- GitHub Actions (`.github/workflows/ci.yml`) runs the same checks on pushes to `main` and on pull requests.
 
 ## Working on a lab
 

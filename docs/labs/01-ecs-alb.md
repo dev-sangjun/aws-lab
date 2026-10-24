@@ -23,19 +23,19 @@ flowchart LR
 
 ## Key concepts (restaurant analogy)
 
-| Concept | One-line definition | Restaurant analogy |
-| --- | --- | --- |
-| **Docker image** | The app and its runtime packed together | A meal kit: tastes the same wherever you heat it |
-| **ECR** | AWS storage for Docker images | The meal-kit warehouse |
-| **VPC** | Your own isolated network | The restaurant building |
-| **Subnet / AZ** | A section of the VPC / a physically separate data center | Branch 1 and branch 2: if one loses power, the other stays open |
-| **ECS cluster** | A group for managing tasks | The kitchen |
-| **Task** | A running container | One cook |
-| **Service** | The rule "always keep N tasks running" | The head chef: replaces a cook who collapses |
-| **Fargate** | Run containers without managing servers | A staffing agency: sends cooks, you don't deal with their housing |
-| **ALB** | Spreads incoming requests across tasks | The host: seats guests with a free cook |
-| **Target group / health check** | The list of tasks the ALB can send to / a periodic "are you OK?" | The shift roster / asking "you OK?" every 10 seconds |
-| **Auto scaling** | Adjusts the task count to the load | Calling in extra cooks when it gets busy |
+| Concept                         | One-line definition                                              | Restaurant analogy                                                |
+| ------------------------------- | ---------------------------------------------------------------- | ----------------------------------------------------------------- |
+| **Docker image**                | The app and its runtime packed together                          | A meal kit: tastes the same wherever you heat it                  |
+| **ECR**                         | AWS storage for Docker images                                    | The meal-kit warehouse                                            |
+| **VPC**                         | Your own isolated network                                        | The restaurant building                                           |
+| **Subnet / AZ**                 | A section of the VPC / a physically separate data center         | Branch 1 and branch 2: if one loses power, the other stays open   |
+| **ECS cluster**                 | A group for managing tasks                                       | The kitchen                                                       |
+| **Task**                        | A running container                                              | One cook                                                          |
+| **Service**                     | The rule "always keep N tasks running"                           | The head chef: replaces a cook who collapses                      |
+| **Fargate**                     | Run containers without managing servers                          | A staffing agency: sends cooks, you don't deal with their housing |
+| **ALB**                         | Spreads incoming requests across tasks                           | The host: seats guests with a free cook                           |
+| **Target group / health check** | The list of tasks the ALB can send to / a periodic "are you OK?" | The shift roster / asking "you OK?" every 10 seconds              |
+| **Auto scaling**                | Adjusts the task count to the load                               | Calling in extra cooks when it gets busy                          |
 
 ## SST code → AWS resources
 
@@ -54,13 +54,13 @@ const service = new sst.aws.Service("MyService", {
   image: { context: "./", dockerfile: "Dockerfile" },
   cpu: "0.25 vCPU",
   memory: "0.5 GB",
-  environment: { PORT: "3000" },                     // Express listens here
-  scaling: { min: 2, max: 4, cpuUtilization: 70 },   // 2 to 4 tasks by CPU
+  environment: { PORT: "3000" }, // Express listens here
+  scaling: { min: 2, max: 4, cpuUtilization: 70 }, // 2 to 4 tasks by CPU
   loadBalancer: {
-    rules: [{ listen: "80/http", forward: "3000/http" }],               // ALB :80 → task :3000
+    rules: [{ listen: "80/http", forward: "3000/http" }], // ALB :80 → task :3000
     health: { "3000/http": { path: "/health", interval: "10 seconds" } },
   },
-});
+})
 ```
 
 ## Docker image: 3-stage build
@@ -77,11 +77,11 @@ flowchart LR
 
 ## API
 
-| Route | What it does |
-| --- | --- |
-| `GET /` | Returns `host` (which task answered), `version`, and `startedAt` |
-| `GET /health` | For the ALB health check. Returns `200 ok` |
-| `POST /crash` | Kills the process on purpose, to watch self-healing |
+| Route         | What it does                                                     |
+| ------------- | ---------------------------------------------------------------- |
+| `GET /`       | Returns `host` (which task answered), `version`, and `startedAt` |
+| `GET /health` | For the ALB health check. Returns `200 ok`                       |
+| `POST /crash` | Kills the process on purpose, to watch self-healing              |
 
 ## Experiments
 
@@ -129,11 +129,11 @@ sequenceDiagram
 
 ## Cost (while running)
 
-| Resource | Roughly |
-| --- | --- |
-| ALB | About $16/month (even with no traffic) |
-| Fargate task (0.25 vCPU, 0.5 GB) | About $9/month each + about $3.6 for the public IPv4 |
-| Cloud Map namespace (created by SST `Vpc`) | About $0.50/month |
+| Resource                                   | Roughly                                              |
+| ------------------------------------------ | ---------------------------------------------------- |
+| ALB                                        | About $16/month (even with no traffic)               |
+| Fargate task (0.25 vCPU, 0.5 GB)           | About $9/month each + about $3.6 for the public IPv4 |
+| Cloud Map namespace (created by SST `Vpc`) | About $0.50/month                                    |
 
 ## Commands
 
