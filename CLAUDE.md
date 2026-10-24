@@ -43,4 +43,6 @@ bunx sst remove --stage dev    # delete everything after a lab
 - The user types the lab code and runs every command that changes AWS (`sst deploy`, `sst remove`, console changes). Explain and review; don't edit lab code or deploy unless asked.
 - Read-only AWS checks are fine (`describe-*`, `list-*`, `get-*`, `logs tail`).
 - Resources cost money while they run (the ALB and Fargate tasks most of all), so end every lab with `sst remove`.
+- `/start-lab` (`.claude/skills/start-lab/`) switches to a lab's `feature/<slug>` branch, creating it from the latest main if needed.
+- Exception: when the user types `/end-lab` (`.claude/skills/end-lab/`), run `sst remove --stage dev` for them, restore `sst-env.d.ts`, and verify nothing billable is left.
 - AWS console paths are written with the English UI labels, e.g. `Lambda → Functions → <fn> → Configuration → Triggers`.
