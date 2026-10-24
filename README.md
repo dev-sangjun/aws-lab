@@ -7,17 +7,25 @@ Hands-on labs for learning AWS one service at a time with SST v4. Each lab ends 
 ```mermaid
 flowchart LR
     U["User<br>curl / browser"] -->|"HTTP :80"| ALB["ALB<br>load balancer"]
+    U -->|"https"| G["API Gateway<br>HTTP API"]
     subgraph VPC["VPC (us-east-1, 2 AZs)"]
         ALB --> T1["ECS Task 1<br>Express :3000"]
         ALB --> T2["ECS Task 2<br>Express :3000"]
+        G -->|"VPC Link"| T1
+        G -->|"VPC Link"| T2
     end
+    T1 -->|"POST /jobs"| Q["JobQueue<br>SQS"]
+    T2 --> Q
+    Q --> L["Worker<br>Lambda"]
+    Q -->|"3 failed tries"| D["JobDLQ<br>SQS"]
 ```
 
 ## Labs
 
-| #   | Lab               | Key concepts                                                                | Notes                                    |
-| --- | ----------------- | --------------------------------------------------------------------------- | ---------------------------------------- |
-| 1   | ECS Fargate + ALB | Containers, tasks and services, load balancing, health checks, self-healing | [01-ecs-alb.md](docs/labs/01-ecs-alb.md) |
+| #   | Lab                        | Key concepts                                                                | Notes                                                      |
+| --- | -------------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| 1   | ECS Fargate + ALB          | Containers, tasks and services, load balancing, health checks, self-healing | [01-ecs-alb.md](docs/labs/01-ecs-alb.md)                   |
+| 2   | Lambda + SQS + API Gateway | Queues, async jobs, batches, retries and DLQ, VPC Link, Cloud Map           | [02-lambda-sqs-apigw.md](docs/labs/02-lambda-sqs-apigw.md) |
 
 ## Common commands
 

@@ -6,6 +6,26 @@
 
 declare module "sst" {
   export interface Resource {
+    "Api": {
+      "type": "sst.aws.ApiGatewayV2"
+      "url": string
+    }
+    "JobDLQ": {
+      "type": "sst.aws.Queue"
+      "url": string
+    }
+    "JobQueue": {
+      "type": "sst.aws.Queue"
+      "url": string
+    }
+    "MyService": {
+      "service": string
+      "type": "sst.aws.Service"
+      "url": string
+    }
+    "MyVpc": {
+      "type": "sst.aws.Vpc"
+    }
   }
 }
 

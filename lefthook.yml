@@ -2,6 +2,9 @@
 pre-commit:
   piped: true # stop at the first failing job
   jobs:
+    - name: claude-md
+      run: sh scripts/check-claude-md.sh
+
     - name: format
       glob: "*.{ts,js,json,jsonc,md,yml,yaml}"
       exclude:
