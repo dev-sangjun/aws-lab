@@ -1,0 +1,23 @@
+# Runs on every `git commit`. Fixes what it can, then blocks the commit if anything still fails.
+pre-commit:
+  piped: true # stop at the first failing job
+  jobs:
+    - name: claude-md
+      run: sh scripts/check-claude-md.sh
+
+    - name: format
+      glob: "*.{ts,js,json,jsonc,md,yml,yaml}"
+      exclude:
+        - sst-env.d.ts
+      run: bunx oxfmt {staged_files}
+      stage_fixed: true # re-stage the formatted files
+
+    - name: lint
+      glob: "*.{ts,js}"
+      exclude:
+        - sst-env.d.ts
+      run: bunx oxlint --fix --deny-warnings {staged_files}
+      stage_fixed: true
+
+    - name: typecheck
+      run: bun run typecheck

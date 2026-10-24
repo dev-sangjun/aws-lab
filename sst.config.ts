@@ -10,9 +10,9 @@ export default $config({
       providers: {
         aws: {
           region: "us-east-1",
-          profile: "dev"
-        }
-      }
+          profile: "dev",
+        },
+      },
     }
   },
   async run() {
@@ -21,25 +21,51 @@ export default $config({
 
     // ECS cluster
     const cluster = new sst.aws.Cluster("MyCluster", {
-      vpc
+      vpc,
+    })
+
+    // DLQ: stores failed messages
+    const dlq = new sst.aws.Queue("JobDLQ")
+
+    // Queue: moves a message to the DLQ after 3 failed tries
+    const queue = new sst.aws.Queue("JobQueue", {
+      dlq: {
+        queue: dlq.arn,
+        retry: 3, // 3 tries in total (maxReceiveCount)
+      },
+    })
+
+    // Subscribe Lambda worker to the queue
+    queue.subscribe("src/worker.handler", {
+      batch: {
+        size: 5,
+        window: "5 seconds", // Wait up to 5 seconds to gather a batch
+        partialResponses: true, // Retry only the failed messages, not the whole batch
+      },
     })
 
     // Fargate service + ALB
     const service = new sst.aws.Service("MyService", {
       cluster,
+      // Let the tasks send to the queue (permission + URL)
+      link: [queue],
+      // Let API Gateway find the tasks and call the Express app on port 3000
+      serviceRegistry: {
+        port: 3000,
+      },
       image: {
         context: "./",
-        dockerfile: "Dockerfile"
+        dockerfile: "Dockerfile",
       },
       cpu: "0.25 vCPU",
       memory: "0.5 GB",
       environment: {
-        PORT: "3000"
+        PORT: "3000",
       },
       scaling: {
         min: 2,
         max: 4,
-        cpuUtilization: 70
+        cpuUtilization: 70,
       },
 
       loadBalancer: {
@@ -55,13 +81,23 @@ export default $config({
       },
 
       dev: {
-        command: "bun run dev"
-      }
+        command: "bun run dev",
+      },
     })
 
-    return {
-      url: service.url
-    }
+    // API Gateway connected into the VPC so it can reach the tasks
+    const api = new sst.aws.ApiGatewayV2("Api", {
+      vpc,
+    })
 
+    // Send all requests to the ECS tasks
+    api.routePrivate("$default", service.nodes.cloudmapService.arn)
+
+    return {
+      url: service.url,
+      apiUrl: api.url,
+      queueUrl: queue.url,
+      dlqUrl: dlq.url,
+    }
   },
 })

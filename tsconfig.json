@@ -1,19 +1,16 @@
 {
   "compilerOptions": {
-    // Node 22 (Dockerfile의 node:22-alpine) 기준
+    // Node 22 (node:22-alpine in the Dockerfile)
     "lib": ["ES2023"],
     "target": "ES2023",
     "types": ["node"],
-
-    // package.json의 "type": "module"에 맞춰 ESM으로 출력
+    // ESM, to match "type": "module" in package.json
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "verbatimModuleSyntax": true,
-
-    // src/*.ts → dist/*.js
+    // Type check only (tsc --noEmit); bun build makes dist
     "rootDir": "src",
     "outDir": "dist",
-
     // Best practices
     "strict": true,
     "skipLibCheck": true,
@@ -21,5 +18,5 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true
   },
-  "include": ["src"]
+  "include": ["src", "sst-env.d.ts"]
 }
